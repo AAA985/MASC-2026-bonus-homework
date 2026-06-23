@@ -22,6 +22,7 @@
     <arg name="target_z"/>
     <arg name="drone_id"/>
     <arg name="formation_type"/>
+    <arg name="config_file" default="$(find ego_planner)/config/normal_hexagon.yaml"/>
     <arg name="weight_obstacle"/>
     <arg name="weight_swarm"/>
     <arg name="weight_feasibility"/>
@@ -39,6 +40,7 @@
     <!-- main algorithm params -->
     <include file="$(find ego_planner)/launch/advanced_param.xml">
         <arg name="drone_id"                value="$(arg drone_id)"/>
+        <arg name="config_file"             value="$(arg config_file)"/>
         <!-- <arg name="formation_type"          value="$(arg formation_type)"/> -->
         <arg name="map_size_x_"             value="$(arg map_size_x)"/>
         <arg name="map_size_y_"             value="$(arg map_size_y)"/>

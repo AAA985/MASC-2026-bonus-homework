@@ -1,0 +1,28 @@
+# SYSU Formation Task Config
+# Formation sequence: S -> Y -> S -> U, each lasting 3 seconds
+
+global_goal:
+  # swarm_central_pos is set dynamically via /move_base_simple/goal topic
+  swarm_scale: 2.0
+  # Relative positions define per-drone offset from central goal (S-shape spread)
+  relative_pos_0: {x:  0.0,  y:  2.0,  z: 0.0}
+  relative_pos_1: {x:  0.5,  y:  2.0,  z: 0.0}
+  relative_pos_2: {x: -0.5,  y:  1.0,  z: 0.0}
+  relative_pos_3: {x:  0.0,  y:  0.0,  z: 0.0}
+  relative_pos_4: {x:  0.5,  y: -1.0,  z: 0.0}
+  relative_pos_5: {x: -0.5,  y: -2.0,  z: 0.0}
+  relative_pos_6: {x:  0.0,  y: -2.0,  z: 0.0}
+
+optimization:
+  formation_type      : 2        # S_SHAPE initially; changed dynamically at runtime
+  weight_obstacle     : 50000.0
+  weight_swarm        : 50000.0
+  weight_feasibility  : 10000.0
+  weight_sqrvariance  : 10000.0
+  weight_time         : 80.0
+  weight_formation    : 15000.0
+  obstacle_clearance  : 0.5
+  swarm_clearance     : 0.5
+
+fsm:
+  replan_trajectory_time : 0.1

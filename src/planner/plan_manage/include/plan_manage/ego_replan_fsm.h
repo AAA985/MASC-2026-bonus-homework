@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <std_msgs/Int32.h>
 using std::vector;
 
 namespace ego_planner
@@ -101,6 +102,7 @@ namespace ego_planner
     ros::Publisher reached_pub_, start_pub_;
     ros::Subscriber central_goal;
     ros::Subscriber broadcast_ploytraj_sub_;
+    ros::Subscriber formation_type_sub_;
     // result file and file name
     string result_fn_;
     fstream result_file_;
@@ -127,6 +129,7 @@ namespace ego_planner
     void RecvBroadcastPolyTrajCallback(const traj_utils::PolyTrajConstPtr &msg);
     void polyTraj2ROSMsg(traj_utils::PolyTraj &msg);
     void formationWaypointCallback(const geometry_msgs::PoseStampedPtr &msg);
+    void formationTypeCallback(const std_msgs::Int32ConstPtr &msg);
     bool frontEndPathSearching();
     bool checkCollision();
 

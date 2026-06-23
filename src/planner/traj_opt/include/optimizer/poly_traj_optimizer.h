@@ -65,7 +65,10 @@ namespace ego_planner
     enum FORMATION_TYPE
     {
       NONE_FORMATION        = 0,
-      REGULAR_HEXAGON       = 1
+      REGULAR_HEXAGON       = 1,
+      S_SHAPE               = 2,
+      Y_SHAPE               = 3,
+      U_SHAPE               = 4
     };
 
     /* optimization parameters */
@@ -224,6 +227,55 @@ namespace ego_planner
           break;
         }
 
+        case FORMATION_TYPE::S_SHAPE :
+        {
+          // S-shape: 7 drones tracing the letter S (viewed from above)
+          // top-right bar → upper-left turn → center → lower-right turn → bottom-left bar
+          swarm_des.push_back(Eigen::Vector3d( 0.0,  2.0, 0));  // D0: top center
+          swarm_des.push_back(Eigen::Vector3d( 1.0,  2.0, 0));  // D1: top right
+          swarm_des.push_back(Eigen::Vector3d(-1.0,  1.0, 0));  // D2: upper left
+          swarm_des.push_back(Eigen::Vector3d( 0.0,  0.0, 0));  // D3: center
+          swarm_des.push_back(Eigen::Vector3d( 1.0, -1.0, 0));  // D4: lower right
+          swarm_des.push_back(Eigen::Vector3d(-1.0, -2.0, 0));  // D5: bottom left
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D6: bottom center
+
+          formation_size_ = swarm_des.size();
+          swarm_graph_->setDesiredForm(swarm_des);
+          break;
+        }
+
+        case FORMATION_TYPE::Y_SHAPE :
+        {
+          // Y-shape: two arms diverging upward, one stem going down
+          swarm_des.push_back(Eigen::Vector3d(-2.0,  2.0, 0));  // D0: left arm tip
+          swarm_des.push_back(Eigen::Vector3d(-1.0,  1.0, 0));  // D1: left arm mid
+          swarm_des.push_back(Eigen::Vector3d( 0.0,  0.0, 0));  // D2: junction
+          swarm_des.push_back(Eigen::Vector3d( 1.0,  1.0, 0));  // D3: right arm mid
+          swarm_des.push_back(Eigen::Vector3d( 2.0,  2.0, 0));  // D4: right arm tip
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -1.0, 0));  // D5: upper stem
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D6: lower stem
+
+          formation_size_ = swarm_des.size();
+          swarm_graph_->setDesiredForm(swarm_des);
+          break;
+        }
+
+        case FORMATION_TYPE::U_SHAPE :
+        {
+          // U-shape: two vertical sides connected at the bottom, open at top
+          swarm_des.push_back(Eigen::Vector3d(-2.0,  2.0, 0));  // D0: top left
+          swarm_des.push_back(Eigen::Vector3d(-2.0,  0.0, 0));  // D1: middle left
+          swarm_des.push_back(Eigen::Vector3d(-1.0, -2.0, 0));  // D2: bottom left curve
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D3: bottom center
+          swarm_des.push_back(Eigen::Vector3d( 1.0, -2.0, 0));  // D4: bottom right curve
+          swarm_des.push_back(Eigen::Vector3d( 2.0,  0.0, 0));  // D5: middle right
+          swarm_des.push_back(Eigen::Vector3d( 2.0,  2.0, 0));  // D6: top right
+
+          formation_size_ = swarm_des.size();
+          swarm_graph_->setDesiredForm(swarm_des);
+          break;
+        }
+
         default:
           break;
       }
@@ -231,6 +283,12 @@ namespace ego_planner
 
   public:
 
+    void changeFormation(int type)
+    {
+      use_formation_ = true;
+      setDesiredFormation(type);
+      ROS_INFO("[PolyTrajOpt] Formation changed to type %d", type);
+    }
 
     typedef unique_ptr<PolyTrajOptimizer> Ptr;
 

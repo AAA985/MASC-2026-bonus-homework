@@ -117,6 +117,9 @@ namespace ego_planner
     {
       central_goal = nh.subscribe("/move_base_simple/goal", 1, &EGOReplanFSM::formationWaypointCallback, this);
     }
+
+    formation_type_sub_ = nh.subscribe("/formation_type", 1, &EGOReplanFSM::formationTypeCallback, this);
+
     cout << "Wrong target_type_ value! target_type_=" << target_type_ << endl;
   }
 
@@ -832,6 +835,13 @@ namespace ego_planner
     poly_traj_pub_.publish(msg);
 
     return true;
+  }
+
+  void EGOReplanFSM::formationTypeCallback(const std_msgs::Int32ConstPtr &msg)
+  {
+    planner_manager_->ploy_traj_opt_->changeFormation(msg->data);
+    ROS_INFO("[FSM] Drone %d: formation changed to type %d",
+             planner_manager_->pp_.drone_id, msg->data);
   }
 
 } // namespace ego_planner
