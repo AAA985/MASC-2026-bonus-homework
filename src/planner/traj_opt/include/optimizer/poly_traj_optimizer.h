@@ -229,15 +229,18 @@ namespace ego_planner
 
         case FORMATION_TYPE::S_SHAPE :
         {
-          // S-shape: 7 drones tracing the letter S (viewed from above)
-          // top-right bar → upper-left turn → center → lower-right turn → bottom-left bar
-          swarm_des.push_back(Eigen::Vector3d( 0.0,  2.0, 0));  // D0: top center
-          swarm_des.push_back(Eigen::Vector3d( 1.0,  2.0, 0));  // D1: top right
-          swarm_des.push_back(Eigen::Vector3d(-1.0,  1.0, 0));  // D2: upper left
-          swarm_des.push_back(Eigen::Vector3d( 0.0,  0.0, 0));  // D3: center
-          swarm_des.push_back(Eigen::Vector3d( 1.0, -1.0, 0));  // D4: lower right
-          swarm_des.push_back(Eigen::Vector3d(-1.0, -2.0, 0));  // D5: bottom left
-          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D6: bottom center
+          // S-shape: 10 drones
+          // top-right → upper-left curve → center → lower-right curve → bottom-left
+          swarm_des.push_back(Eigen::Vector3d( 1.5,  3.0, 0));  // D0: top right
+          swarm_des.push_back(Eigen::Vector3d( 0.0,  3.0, 0));  // D1: top center
+          swarm_des.push_back(Eigen::Vector3d(-1.5,  2.0, 0));  // D2: upper-left curve
+          swarm_des.push_back(Eigen::Vector3d(-1.5,  1.0, 0));  // D3: left side upper
+          swarm_des.push_back(Eigen::Vector3d(-0.5,  0.0, 0));  // D4: center-left
+          swarm_des.push_back(Eigen::Vector3d( 0.5,  0.0, 0));  // D5: center-right
+          swarm_des.push_back(Eigen::Vector3d( 1.5, -1.0, 0));  // D6: right side lower
+          swarm_des.push_back(Eigen::Vector3d( 1.5, -2.0, 0));  // D7: lower-right curve
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -3.0, 0));  // D8: bottom center
+          swarm_des.push_back(Eigen::Vector3d(-1.5, -3.0, 0));  // D9: bottom left
 
           formation_size_ = swarm_des.size();
           swarm_graph_->setDesiredForm(swarm_des);
@@ -246,14 +249,17 @@ namespace ego_planner
 
         case FORMATION_TYPE::Y_SHAPE :
         {
-          // Y-shape: two arms diverging upward, one stem going down
-          swarm_des.push_back(Eigen::Vector3d(-2.0,  2.0, 0));  // D0: left arm tip
-          swarm_des.push_back(Eigen::Vector3d(-1.0,  1.0, 0));  // D1: left arm mid
-          swarm_des.push_back(Eigen::Vector3d( 0.0,  0.0, 0));  // D2: junction
-          swarm_des.push_back(Eigen::Vector3d( 1.0,  1.0, 0));  // D3: right arm mid
-          swarm_des.push_back(Eigen::Vector3d( 2.0,  2.0, 0));  // D4: right arm tip
-          swarm_des.push_back(Eigen::Vector3d( 0.0, -1.0, 0));  // D5: upper stem
-          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D6: lower stem
+          // Y-shape: 10 drones — two 3-drone arms + junction + 3-drone stem
+          swarm_des.push_back(Eigen::Vector3d(-3.0,  3.0, 0));  // D0: left arm tip
+          swarm_des.push_back(Eigen::Vector3d(-2.0,  2.0, 0));  // D1: left arm mid
+          swarm_des.push_back(Eigen::Vector3d(-1.0,  1.0, 0));  // D2: left arm inner
+          swarm_des.push_back(Eigen::Vector3d( 3.0,  3.0, 0));  // D3: right arm tip
+          swarm_des.push_back(Eigen::Vector3d( 2.0,  2.0, 0));  // D4: right arm mid
+          swarm_des.push_back(Eigen::Vector3d( 1.0,  1.0, 0));  // D5: right arm inner
+          swarm_des.push_back(Eigen::Vector3d( 0.0,  0.0, 0));  // D6: junction
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -1.0, 0));  // D7: stem upper
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D8: stem middle
+          swarm_des.push_back(Eigen::Vector3d( 0.0, -3.0, 0));  // D9: stem lower
 
           formation_size_ = swarm_des.size();
           swarm_graph_->setDesiredForm(swarm_des);
@@ -262,14 +268,17 @@ namespace ego_planner
 
         case FORMATION_TYPE::U_SHAPE :
         {
-          // U-shape: two vertical sides connected at the bottom, open at top
-          swarm_des.push_back(Eigen::Vector3d(-2.0,  2.0, 0));  // D0: top left
-          swarm_des.push_back(Eigen::Vector3d(-2.0,  0.0, 0));  // D1: middle left
-          swarm_des.push_back(Eigen::Vector3d(-1.0, -2.0, 0));  // D2: bottom left curve
-          swarm_des.push_back(Eigen::Vector3d( 0.0, -2.0, 0));  // D3: bottom center
-          swarm_des.push_back(Eigen::Vector3d( 1.0, -2.0, 0));  // D4: bottom right curve
-          swarm_des.push_back(Eigen::Vector3d( 2.0,  0.0, 0));  // D5: middle right
-          swarm_des.push_back(Eigen::Vector3d( 2.0,  2.0, 0));  // D6: top right
+          // U-shape: 10 drones — 3 left + 4 bottom + 3 right, open at top
+          swarm_des.push_back(Eigen::Vector3d(-2.0,  3.0, 0));  // D0: top-left
+          swarm_des.push_back(Eigen::Vector3d(-2.0,  1.0, 0));  // D1: left upper
+          swarm_des.push_back(Eigen::Vector3d(-2.0, -1.0, 0));  // D2: left lower
+          swarm_des.push_back(Eigen::Vector3d(-1.5, -3.0, 0));  // D3: bottom-left
+          swarm_des.push_back(Eigen::Vector3d(-0.5, -3.0, 0));  // D4: bottom center-left
+          swarm_des.push_back(Eigen::Vector3d( 0.5, -3.0, 0));  // D5: bottom center-right
+          swarm_des.push_back(Eigen::Vector3d( 1.5, -3.0, 0));  // D6: bottom-right
+          swarm_des.push_back(Eigen::Vector3d( 2.0, -1.0, 0));  // D7: right lower
+          swarm_des.push_back(Eigen::Vector3d( 2.0,  1.0, 0));  // D8: right upper
+          swarm_des.push_back(Eigen::Vector3d( 2.0,  3.0, 0));  // D9: top-right
 
           formation_size_ = swarm_des.size();
           swarm_graph_->setDesiredForm(swarm_des);

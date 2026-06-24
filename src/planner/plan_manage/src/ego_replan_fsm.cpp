@@ -49,11 +49,11 @@ namespace ego_planner
       nh.param("fsm/target" + to_string(i) + "_z", goalpoints_[i][2], -1.0);
     }
 
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 10; i++)
     {
-      nh.param("global_goal/relative_pos_" + to_string(i) + "/x", swarm_relative_pts_[i][0], -1.0);
-      nh.param("global_goal/relative_pos_" + to_string(i) + "/y", swarm_relative_pts_[i][1], -1.0);
-      nh.param("global_goal/relative_pos_" + to_string(i) + "/z", swarm_relative_pts_[i][2], -1.0);
+      nh.param("global_goal/relative_pos_" + to_string(i) + "/x", swarm_relative_pts_[i][0], 0.0);
+      nh.param("global_goal/relative_pos_" + to_string(i) + "/y", swarm_relative_pts_[i][1], 0.0);
+      nh.param("global_goal/relative_pos_" + to_string(i) + "/z", swarm_relative_pts_[i][2], 0.0);
     }
 
     nh.param("global_goal/swarm_scale", swarm_scale_, 1.0);
@@ -120,7 +120,12 @@ namespace ego_planner
 
     formation_type_sub_ = nh.subscribe("/formation_type", 1, &EGOReplanFSM::formationTypeCallback, this);
 
-    cout << "Wrong target_type_ value! target_type_=" << target_type_ << endl;
+    if (target_type_ != TARGET_TYPE::MANUAL_TARGET &&
+        target_type_ != TARGET_TYPE::PRESET_TARGET &&
+        target_type_ != TARGET_TYPE::SWARM_MANUAL_TARGET)
+    {
+      cout << "Wrong target_type_ value! target_type_=" << target_type_ << endl;
+    }
   }
 
   void EGOReplanFSM::execFSMCallback(const ros::TimerEvent &e)
@@ -839,9 +844,45 @@ namespace ego_planner
 
   void EGOReplanFSM::formationTypeCallback(const std_msgs::Int32ConstPtr &msg)
   {
-    planner_manager_->ploy_traj_opt_->changeFormation(msg->data);
+    int type = msg->data;
+    planner_manager_->ploy_traj_opt_->changeFormation(type);
     ROS_INFO("[FSM] Drone %d: formation changed to type %d",
-             planner_manager_->pp_.drone_id, msg->data);
+             planner_manager_->pp_.drone_id, type);
+
+    // Update per-drone relative offset to match the new formation shape.
+    // This ensures end_pt_ = zone_center + formation_slot when the next goal arrives.
+    // Positions mirror setDesiredFormation() in poly_traj_optimizer.h (same ordering).
+    static const double S_pos[10][3] = {
+      { 1.5,  3.0, 0}, { 0.0,  3.0, 0}, {-1.5,  2.0, 0}, {-1.5,  1.0, 0}, {-0.5,  0.0, 0},
+      { 0.5,  0.0, 0}, { 1.5, -1.0, 0}, { 1.5, -2.0, 0}, { 0.0, -3.0, 0}, {-1.5, -3.0, 0}
+    };
+    static const double Y_pos[10][3] = {
+      {-3.0,  3.0, 0}, {-2.0,  2.0, 0}, {-1.0,  1.0, 0}, { 3.0,  3.0, 0}, { 2.0,  2.0, 0},
+      { 1.0,  1.0, 0}, { 0.0,  0.0, 0}, { 0.0, -1.0, 0}, { 0.0, -2.0, 0}, { 0.0, -3.0, 0}
+    };
+    static const double U_pos[10][3] = {
+      {-2.0,  3.0, 0}, {-2.0,  1.0, 0}, {-2.0, -1.0, 0}, {-1.5, -3.0, 0}, {-0.5, -3.0, 0},
+      { 0.5, -3.0, 0}, { 1.5, -3.0, 0}, { 2.0, -1.0, 0}, { 2.0,  1.0, 0}, { 2.0,  3.0, 0}
+    };
+
+    const double (*pos)[3] = nullptr;
+    if      (type == 2) pos = S_pos;
+    else if (type == 3) pos = Y_pos;
+    else if (type == 4) pos = U_pos;
+
+    int id = planner_manager_->pp_.drone_id;
+    if (pos && id >= 0 && id < 10)
+    {
+      swarm_relative_pts_[id][0] = pos[id][0];
+      swarm_relative_pts_[id][1] = pos[id][1];
+      swarm_relative_pts_[id][2] = pos[id][2];
+      // If a central goal already exists, recompute end_pt_ immediately.
+      if (have_target_)
+      {
+        Eigen::Vector3d rp(pos[id][0], pos[id][1], pos[id][2]);
+        end_pt_ = swarm_central_pos_ + swarm_scale_ * rp;
+      }
+    }
   }
 
 } // namespace ego_planner

@@ -1,20 +1,23 @@
-# SYSU Formation Task Config
-# Formation sequence: S -> Y -> S -> U, each lasting 3 seconds
+# SYSU Formation Task Config — 10 drones
+# swarm_scale=1.0: end_pt = zone_center + formation_slot_offset (updated in
+# formationTypeCallback).  All individual goals are unique → no NaN from
+# coincident end points.  Formation shape maintained by SwarmGraph SNL cost.
 
 global_goal:
-  # swarm_central_pos is set dynamically via /move_base_simple/goal topic
-  swarm_scale: 2.0
-  # Relative positions define per-drone offset from central goal (S-shape spread)
-  relative_pos_0: {x:  0.0,  y:  2.0,  z: 0.0}
-  relative_pos_1: {x:  0.5,  y:  2.0,  z: 0.0}
-  relative_pos_2: {x: -0.5,  y:  1.0,  z: 0.0}
-  relative_pos_3: {x:  0.0,  y:  0.0,  z: 0.0}
-  relative_pos_4: {x:  0.5,  y: -1.0,  z: 0.0}
-  relative_pos_5: {x: -0.5,  y: -2.0,  z: 0.0}
-  relative_pos_6: {x:  0.0,  y: -2.0,  z: 0.0}
+  swarm_scale: 1.0
+  relative_pos_0: {x:  1.5,  y:  3.0,  z: 0.0}
+  relative_pos_1: {x:  0.0,  y:  3.0,  z: 0.0}
+  relative_pos_2: {x: -1.5,  y:  2.0,  z: 0.0}
+  relative_pos_3: {x: -1.5,  y:  1.0,  z: 0.0}
+  relative_pos_4: {x: -0.5,  y:  0.0,  z: 0.0}
+  relative_pos_5: {x:  0.5,  y:  0.0,  z: 0.0}
+  relative_pos_6: {x:  1.5,  y: -1.0,  z: 0.0}
+  relative_pos_7: {x:  1.5,  y: -2.0,  z: 0.0}
+  relative_pos_8: {x:  0.0,  y: -3.0,  z: 0.0}
+  relative_pos_9: {x: -1.5,  y: -3.0,  z: 0.0}
 
 optimization:
-  formation_type      : 2        # S_SHAPE initially; changed dynamically at runtime
+  formation_type      : 2        # S_SHAPE at startup
   weight_obstacle     : 50000.0
   weight_swarm        : 50000.0
   weight_feasibility  : 10000.0

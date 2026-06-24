@@ -11,7 +11,7 @@
     <arg name="broadcast_ip" value="127.0.0.255"/>
   </include>
 
-  <!-- random obstacle map -->
+  <!-- random obstacle map (same params as normal_hexagon, do not modify) -->
   <node pkg="map_generator" name="random_forest" type="random_forest" output="screen">
     <param name="map/x_size"     value="34"/>
     <param name="map/y_size"     value="15"/>
@@ -36,93 +36,33 @@
     <param name="min_distance" value="0.8"/>
   </node>
 
-  <!-- Drone 0 -->
+  <!-- =====================================================================
+       10 drones start in S-formation on the LEFT of obstacles (x ~ +25).
+       In RViz the x-axis increases to the LEFT on screen, so:
+         x=+25  → LEFT of screen  → LEFT of obstacle field  (start here in S)
+         x=0    → center          → obstacle field center
+         x=-28  → RIGHT of screen → RIGHT of obstacle field (goal)
+
+       Drones fly LEFT→RIGHT (decreasing x), passing through obstacles.
+       Formation sequence (timed by scheduler):
+         S  (x≈+25 → +5,  clear + obstacle left)
+         Y  (x≈+5  → -5,  obstacle left-center)
+         S  (x≈-5  → -17, obstacle right-center)
+         U  (x≈-17 → -28, exiting + right clear, held)
+
+       S-shape positions relative to center (+25, 0, 0.5):
+         D0(+1.5,+3)  D1(0,+3)  D2(-1.5,+2)  D3(-1.5,+1)  D4(-0.5,0)
+         D5(+0.5, 0)  D6(+1.5,-1) D7(+1.5,-2) D8(0,-3) D9(-1.5,-3)
+       init position = center + relative offset
+  ===================================================================== -->
+
+  <!-- Drone 0: S top-right  (+1.5, +3) -->
   <include file="$(find ego_planner)/launch/run_in_sim.launch">
     <arg name="drone_id"    value="0"/>
-    <arg name="init_x"      value="-26.0"/>
-    <arg name="init_y"      value="0.0"/>
-    <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="26.0"/>
-    <arg name="target_y"    value="0.0"/>
-    <arg name="target_z"    value="0.5"/>
-    <arg name="map_size_x"  value="$(arg map_size_x)"/>
-    <arg name="map_size_y"  value="$(arg map_size_y)"/>
-    <arg name="map_size_z"  value="$(arg map_size_z)"/>
-    <arg name="odom_topic"  value="$(arg odom_topic)"/>
-    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
-  </include>
-
-  <!-- Drone 1 -->
-  <include file="$(find ego_planner)/launch/run_in_sim.launch">
-    <arg name="drone_id"    value="1"/>
-    <arg name="init_x"      value="-23.4"/>
-    <arg name="init_y"      value="-1.5"/>
-    <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="28.6"/>
-    <arg name="target_y"    value="-1.5"/>
-    <arg name="target_z"    value="0.5"/>
-    <arg name="map_size_x"  value="$(arg map_size_x)"/>
-    <arg name="map_size_y"  value="$(arg map_size_y)"/>
-    <arg name="map_size_z"  value="$(arg map_size_z)"/>
-    <arg name="odom_topic"  value="$(arg odom_topic)"/>
-    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
-  </include>
-
-  <!-- Drone 2 -->
-  <include file="$(find ego_planner)/launch/run_in_sim.launch">
-    <arg name="drone_id"    value="2"/>
-    <arg name="init_x"      value="-26.0"/>
-    <arg name="init_y"      value="-3.0"/>
-    <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="26.0"/>
-    <arg name="target_y"    value="-3.0"/>
-    <arg name="target_z"    value="0.5"/>
-    <arg name="map_size_x"  value="$(arg map_size_x)"/>
-    <arg name="map_size_y"  value="$(arg map_size_y)"/>
-    <arg name="map_size_z"  value="$(arg map_size_z)"/>
-    <arg name="odom_topic"  value="$(arg odom_topic)"/>
-    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
-  </include>
-
-  <!-- Drone 3 -->
-  <include file="$(find ego_planner)/launch/run_in_sim.launch">
-    <arg name="drone_id"    value="3"/>
-    <arg name="init_x"      value="-28.6"/>
-    <arg name="init_y"      value="-1.5"/>
-    <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="23.4"/>
-    <arg name="target_y"    value="-1.5"/>
-    <arg name="target_z"    value="0.5"/>
-    <arg name="map_size_x"  value="$(arg map_size_x)"/>
-    <arg name="map_size_y"  value="$(arg map_size_y)"/>
-    <arg name="map_size_z"  value="$(arg map_size_z)"/>
-    <arg name="odom_topic"  value="$(arg odom_topic)"/>
-    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
-  </include>
-
-  <!-- Drone 4 -->
-  <include file="$(find ego_planner)/launch/run_in_sim.launch">
-    <arg name="drone_id"    value="4"/>
-    <arg name="init_x"      value="-28.6"/>
-    <arg name="init_y"      value="1.5"/>
-    <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="23.4"/>
-    <arg name="target_y"    value="1.5"/>
-    <arg name="target_z"    value="0.5"/>
-    <arg name="map_size_x"  value="$(arg map_size_x)"/>
-    <arg name="map_size_y"  value="$(arg map_size_y)"/>
-    <arg name="map_size_z"  value="$(arg map_size_z)"/>
-    <arg name="odom_topic"  value="$(arg odom_topic)"/>
-    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
-  </include>
-
-  <!-- Drone 5 -->
-  <include file="$(find ego_planner)/launch/run_in_sim.launch">
-    <arg name="drone_id"    value="5"/>
-    <arg name="init_x"      value="-26.0"/>
+    <arg name="init_x"      value="26.5"/>
     <arg name="init_y"      value="3.0"/>
     <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="26.0"/>
+    <arg name="target_x"    value="-26.5"/>
     <arg name="target_y"    value="3.0"/>
     <arg name="target_z"    value="0.5"/>
     <arg name="map_size_x"  value="$(arg map_size_x)"/>
@@ -132,14 +72,14 @@
     <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
   </include>
 
-  <!-- Drone 6 -->
+  <!-- Drone 1: S top-center  (0, +3) -->
   <include file="$(find ego_planner)/launch/run_in_sim.launch">
-    <arg name="drone_id"    value="6"/>
-    <arg name="init_x"      value="-23.4"/>
-    <arg name="init_y"      value="1.5"/>
+    <arg name="drone_id"    value="1"/>
+    <arg name="init_x"      value="25.0"/>
+    <arg name="init_y"      value="3.0"/>
     <arg name="init_z"      value="0.5"/>
-    <arg name="target_x"    value="28.6"/>
-    <arg name="target_y"    value="1.5"/>
+    <arg name="target_x"    value="-28.0"/>
+    <arg name="target_y"    value="3.0"/>
     <arg name="target_z"    value="0.5"/>
     <arg name="map_size_x"  value="$(arg map_size_x)"/>
     <arg name="map_size_y"  value="$(arg map_size_y)"/>
@@ -148,13 +88,172 @@
     <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
   </include>
 
-  <!-- Formation scheduler: S -> Y -> S -> U, 3s each, starts after 3s init delay -->
+  <!-- Drone 2: S upper-left  (-1.5, +2) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="2"/>
+    <arg name="init_x"      value="23.5"/>
+    <arg name="init_y"      value="2.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-29.5"/>
+    <arg name="target_y"    value="2.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 3: S left-upper  (-1.5, +1) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="3"/>
+    <arg name="init_x"      value="23.5"/>
+    <arg name="init_y"      value="1.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-29.5"/>
+    <arg name="target_y"    value="1.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 4: S center-left  (-0.5, 0) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="4"/>
+    <arg name="init_x"      value="24.5"/>
+    <arg name="init_y"      value="0.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-28.5"/>
+    <arg name="target_y"    value="0.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 5: S center-right  (+0.5, 0) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="5"/>
+    <arg name="init_x"      value="25.5"/>
+    <arg name="init_y"      value="0.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-27.5"/>
+    <arg name="target_y"    value="0.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 6: S right-lower  (+1.5, -1) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="6"/>
+    <arg name="init_x"      value="26.5"/>
+    <arg name="init_y"      value="-1.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-26.5"/>
+    <arg name="target_y"    value="-1.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 7: S lower-right  (+1.5, -2) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="7"/>
+    <arg name="init_x"      value="26.5"/>
+    <arg name="init_y"      value="-2.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-26.5"/>
+    <arg name="target_y"    value="-2.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 8: S bottom-center  (0, -3) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="8"/>
+    <arg name="init_x"      value="25.0"/>
+    <arg name="init_y"      value="-3.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-28.0"/>
+    <arg name="target_y"    value="-3.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Drone 9: S bottom-left  (-1.5, -3) -->
+  <include file="$(find ego_planner)/launch/run_in_sim.launch">
+    <arg name="drone_id"    value="9"/>
+    <arg name="init_x"      value="23.5"/>
+    <arg name="init_y"      value="-3.0"/>
+    <arg name="init_z"      value="0.5"/>
+    <arg name="target_x"    value="-29.5"/>
+    <arg name="target_y"    value="-3.0"/>
+    <arg name="target_z"    value="0.5"/>
+    <arg name="map_size_x"  value="$(arg map_size_x)"/>
+    <arg name="map_size_y"  value="$(arg map_size_y)"/>
+    <arg name="map_size_z"  value="$(arg map_size_z)"/>
+    <arg name="odom_topic"  value="$(arg odom_topic)"/>
+    <arg name="config_file" value="$(find ego_planner)/config/sysu_formation.yaml"/>
+  </include>
+
+  <!-- Formation scheduler — arrival-detection state machine
+       Each drone gets its own individual target = zone_center + formation_offset[id].
+       The 3-second hold starts only after ALL 10 drones are within arrival_dist
+       of their respective targets.
+
+       Zone layout (x increases to screen-LEFT in RViz):
+         S-init : x ≈ +25   (initial S positions, clear left of obstacles)
+         Y zone : x ≈  +5   (obstacle field left-center)
+         S2 zone: x ≈  -5   (obstacle field right-center)
+         U zone : x ≈ -22   (clear right of obstacles)
+
+       Tuning knobs (no recompile needed):
+         arrival_dist : how close a drone must be to its slot to count as "arrived"
+         fly_timeout  : give up waiting and advance if not all arrived within this time
+         hold_secs    : how long to hold each formation after all drones arrive
+  -->
   <node pkg="ego_planner" name="formation_scheduler"
         type="formation_scheduler.py" output="screen" required="false">
-    <param name="init_delay" value="3.0" type="double"/>
-    <param name="central_x"  value="26.0" type="double"/>
-    <param name="central_y"  value="0.0"  type="double"/>
-    <param name="central_z"  value="0.5"  type="double"/>
+    <param name="init_delay"    value="5.0"   type="double"/>
+    <param name="hold_secs"     value="3.0"   type="double"/>
+    <param name="arrival_dist"  value="1.5"   type="double"/>
+    <param name="fly_timeout"   value="90.0"  type="double"/>
+
+    <param name="s_init_zone_x" value="25.0"  type="double"/>
+    <param name="s_init_zone_y" value="0.0"   type="double"/>
+    <param name="s_init_zone_z" value="0.5"   type="double"/>
+
+    <param name="y_zone_x"      value="5.0"   type="double"/>
+    <param name="y_zone_y"      value="0.0"   type="double"/>
+    <param name="y_zone_z"      value="0.5"   type="double"/>
+
+    <param name="s2_zone_x"     value="-5.0"  type="double"/>
+    <param name="s2_zone_y"     value="0.0"   type="double"/>
+    <param name="s2_zone_z"     value="0.5"   type="double"/>
+
+    <param name="u_zone_x"      value="-22.0" type="double"/>
+    <param name="u_zone_y"      value="0.0"   type="double"/>
+    <param name="u_zone_z"      value="0.5"   type="double"/>
   </node>
 
 </launch>
